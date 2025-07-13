@@ -1,0 +1,2 @@
+-- Placeholder for initial schema.
+-- Further migrations will be added as new entities are created. 
