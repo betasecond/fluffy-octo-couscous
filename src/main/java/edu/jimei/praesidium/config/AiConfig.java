@@ -2,14 +2,23 @@ package edu.jimei.praesidium.config;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.modelmapper.ModelMapper;
 
 /**
- * Configuration for AI-related beans.
+ * Configuration for AI-related components.
  */
 @Configuration
 public class AiConfig {
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
+    }
 
     /**
      * Creates a ChatClient bean using the auto-configured ChatModel.
@@ -21,5 +30,14 @@ public class AiConfig {
     @Bean
     public ChatClient chatClient(ChatModel chatModel) {
         return ChatClient.builder(chatModel).build();
+    }
+
+    @Bean
+    public ChatModel chatModel(@Value("${spring.ai.openai.api-key}") String apiKey,
+                               @Value("${spring.ai.openai.base-url}") String baseUrl) {
+        return OpenAiChatModel.builder()
+                .apiKey(apiKey)
+                .baseUrl(baseUrl)
+                .build();
     }
 } 
