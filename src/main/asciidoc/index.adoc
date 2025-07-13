@@ -1,0 +1,18 @@
+= Praesidium API Documentation
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+This document describes the API for the Praesidium project.
+
+[[overview]]
+== Overview
+
+The Praesidium project provides a set of services for an intelligent customer service copilot.
+
+// Include generated snippets for different services below
+// Example:
+// include::{snippets}/interactive-query-service/submit-query/http-request.adoc[] 
