@@ -31,13 +31,4 @@ public class AiConfig {
     public ChatClient chatClient(ChatModel chatModel) {
         return ChatClient.builder(chatModel).build();
     }
-
-    @Bean
-    public ChatModel chatModel(@Value("${spring.ai.openai.api-key}") String apiKey,
-                               @Value("${spring.ai.openai.base-url}") String baseUrl) {
-        return OpenAiChatModel.builder()
-                .apiKey(apiKey)
-                .baseUrl(baseUrl)
-                .build();
-    }
-} 
+}
