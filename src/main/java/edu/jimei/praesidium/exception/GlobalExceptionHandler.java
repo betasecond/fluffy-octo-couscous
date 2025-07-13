@@ -11,32 +11,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.stream.Collectors;
 
 /**
- * 全局异常处理器
- *
- * @author Advisor
+ * Global exception handler for the application.
+ * Captures exceptions thrown by controllers and formats them into a standardized ApiResponse.
  */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     /**
-     * 处理所有未被捕获的异常
+     * Handles validation exceptions for request bodies.
      *
-     * @param ex the ex
-     * @return a {@link org.springframework.http.ResponseEntity} object.
-     */
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Object>> handleGlobalException(Exception ex) {
-        log.error("Unhandled exception occurred", ex);
-        ApiResponse<Object> response = ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    /**
-     * 处理参数校验异常
-     *
-     * @param ex the ex
-     * @return a {@link org.springframework.http.ResponseEntity} object.
+     * @param ex The MethodArgumentNotValidException that was thrown.
+     * @return A ResponseEntity containing the standardized error response.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -46,5 +32,44 @@ public class GlobalExceptionHandler {
         log.warn("Validation error: {}", errorMessage);
         ApiResponse<Object> response = ApiResponse.error(HttpStatus.BAD_REQUEST, errorMessage);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles resource not found exceptions.
+     *
+     * @param ex The ResourceNotFoundException that was thrown.
+     * @return A ResponseEntity containing the standardized error response.
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        log.warn("Resource not found: {}", ex.getMessage());
+        ApiResponse<Object> response = ApiResponse.error(HttpStatus.NOT_FOUND, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+    
+    /**
+     * Handles illegal argument exceptions.
+     *
+     * @param ex The IllegalArgumentException that was thrown.
+     * @return A ResponseEntity containing the standardized error response.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.warn("Illegal argument: {}", ex.getMessage());
+        ApiResponse<Object> response = ApiResponse.error(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles all other uncaught exceptions.
+     *
+     * @param ex The Exception that was thrown.
+     * @return A ResponseEntity containing a generic internal server error response.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Object>> handleGlobalException(Exception ex) {
+        log.error("Unhandled exception occurred", ex);
+        ApiResponse<Object> response = ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred. Please try again later.");
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 } 
