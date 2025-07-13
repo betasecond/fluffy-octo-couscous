@@ -34,7 +34,7 @@ public class InteractiveQueryServiceImpl implements InteractiveQueryService {
      */
     @Override
     public QueryResponse submitQuery(QueryRequest request) {
-        log.info("Submitting query to AI for user [{}]: '{}'", request.getUserId(), request.getQuery());
+        log.info("Submitting query to AI for user []: '{}'", request.getQuery());
 
         try {
             String response = chatClient.prompt()
@@ -42,7 +42,6 @@ public class InteractiveQueryServiceImpl implements InteractiveQueryService {
                     .call()
                     .content();
 
-            log.info("Received AI response for user [{}].", request.getUserId());
 
             // Placeholder mapping to QueryResponse
             return QueryResponse.builder()
@@ -52,8 +51,8 @@ public class InteractiveQueryServiceImpl implements InteractiveQueryService {
                     .needsHumanReview(false) // Placeholder value
                     .build();
         } catch (Exception e) {
-            log.error("Error calling AI service for query from user [{}]: {}", request.getUserId(), request.getQuery(), e);
+            log.error("Error calling AI service for query from user []: {}", request.getQuery(), e);
             throw new AIServiceException("Failed to get response from AI service for query.", e);
         }
     }
-} 
+}

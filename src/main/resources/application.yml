@@ -62,6 +62,9 @@ spring:
   config:
     activate:
       on-profile: test
+  sql:
+    init:
+      mode: never
   # H2 Datasource Configuration for Tests
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
@@ -73,5 +76,8 @@ spring:
       ddl-auto: create-drop # For tests, we want hibernate to create the schema
   flyway:
     enabled: false # We don't need flyway for in-memory tests, hibernate will create schema
+  ai:
+    openai:
+      api-key: "dummy-key-for-tests"
 
 

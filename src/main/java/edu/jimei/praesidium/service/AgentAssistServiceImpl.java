@@ -32,7 +32,6 @@ public class AgentAssistServiceImpl implements AgentAssistService {
      */
     @Override
     public AssistResponse getRealtimeAssistance(AgentAssistRequest request) {
-        log.info("Getting real-time assistance for agent [{}] on session [{}]", request.getAgentId(), request.getSessionId());
 
         try {
             // This is a placeholder for the actual logic which would involve:
@@ -64,8 +63,8 @@ public class AgentAssistServiceImpl implements AgentAssistService {
                     .informationCompleteness(infoCompleteness)
                     .build();
         } catch (Exception e) {
-            log.error("Error getting real-time assistance for agent [{}]: {}", request.getAgentId(), e.getMessage(), e);
+            log.error("Error getting real-time assistance for agent : {}",  e.getMessage(), e);
             throw new AIServiceException("Failed to get real-time assistance from AI service.", e);
         }
     }
-} 
+}

@@ -70,6 +70,13 @@ try {
     } else {
         Write-Host "Verification FAILED: Status is not APPROVED." -ForegroundColor Red
     }
+
+    # 5. Get reports data
+    Write-Host "`n[5/5] Getting reports data..."
+    $reports = Invoke-RestMethod -Uri "$baseUrl/reports" -Method Get
+    Print-Json $reports
+    Write-Host "Successfully retrieved reports data." -ForegroundColor Green
+
 }
 catch {
     Write-Host "`nAn error occurred during API testing:" -ForegroundColor Red
