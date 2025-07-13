@@ -16,7 +16,7 @@ import java.util.List;
  * The data is typically sourced from a static JSON file.
  */
 @RestController
-@RequestMapping("/api/v1/reports")
+@RequestMapping({"/api/v1/reports", "/api/reports"})
 @RequiredArgsConstructor
 public class ReportController {
 

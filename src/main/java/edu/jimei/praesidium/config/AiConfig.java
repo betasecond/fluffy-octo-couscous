@@ -15,10 +15,7 @@ import org.modelmapper.ModelMapper;
 @Configuration
 public class AiConfig {
 
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
-    }
+
 
     /**
      * Creates a ChatClient bean using the auto-configured ChatModel.

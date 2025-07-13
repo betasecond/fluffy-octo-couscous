@@ -4,9 +4,12 @@ import edu.jimei.praesidium.enums.ReviewItemStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -25,17 +28,18 @@ public class ReviewItem {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    /**
-     * The ID of the knowledge base article or entry associated with this review item.
-     */
-    @Column(nullable = false)
-    private String knowledgeId;
+    private String source;
+    
+    @Column(columnDefinition = "TEXT")
+    private String originalQuery;
 
-    /**
-     * The actual content that needs to be reviewed.
-     */
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String content;
+    @Column(columnDefinition = "TEXT")
+    private String currentAnswer;
+
+    @Column(columnDefinition = "TEXT")
+    private String suggestedAnswer;
+    
+    private String standardQuestion;
 
     /**
      * The current status of the review item (e.g., PENDING, APPROVED, REJECTED).
@@ -45,15 +49,14 @@ public class ReviewItem {
     private ReviewItemStatus status;
 
     /**
-     * The ID of the user who performed the review.
-     */
-    private String reviewerId;
-
-    /**
      * Any comments or feedback provided by the reviewer.
      */
     @Column(columnDefinition = "TEXT")
     private String comments;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private Map<String, Object> metadata;
 
     /**
      * The timestamp when the review item was created.

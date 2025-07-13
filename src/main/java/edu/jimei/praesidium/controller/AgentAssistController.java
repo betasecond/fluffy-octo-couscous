@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Advisor
  */
 @RestController
-@RequestMapping("/api/v1/agent-assist")
+@RequestMapping({"/api/v1/agent-assist", "/api/agent-assist"})
 @RequiredArgsConstructor
 public class AgentAssistController {
 

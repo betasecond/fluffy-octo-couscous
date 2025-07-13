@@ -4,16 +4,16 @@ import edu.jimei.praesidium.enums.ReviewItemStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 public class ReviewItemDto {
-    private UUID id;
-    private String knowledgeId;
-    private String content;
+    private String id;
+    private String source;
+    private String originalQuery;
+    private String currentAnswer;
+    private String suggestedAnswer;
+    private String timestamp;
     private ReviewItemStatus status;
-    private String reviewerId;
-    private String comments;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String standardQuestion;
+    private MetadataDTO metadata;
 } 

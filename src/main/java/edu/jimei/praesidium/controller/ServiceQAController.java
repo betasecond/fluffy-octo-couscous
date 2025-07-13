@@ -14,7 +14,7 @@ import java.util.List;
  * Controller for managing Service QA data.
  */
 @RestController
-@RequestMapping("/api/v1/serviceQA")
+@RequestMapping({"/api/v1/serviceQA", "/api/serviceQA"})
 @RequiredArgsConstructor
 public class ServiceQAController {
 

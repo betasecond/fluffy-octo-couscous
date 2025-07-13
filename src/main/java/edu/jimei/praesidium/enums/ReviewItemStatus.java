@@ -17,5 +17,10 @@ public enum ReviewItemStatus {
     /**
      * 已拒绝
      */
-    REJECTED
+    REJECTED,
+
+    /**
+     * 需要更多信息
+     */
+    NEEDS_INFO
 } 

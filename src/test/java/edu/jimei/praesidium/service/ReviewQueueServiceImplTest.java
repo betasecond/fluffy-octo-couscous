@@ -2,6 +2,7 @@ package edu.jimei.praesidium.service;
 
 import edu.jimei.praesidium.dto.ReviewDecisionRequest;
 import edu.jimei.praesidium.dto.ReviewItemDto;
+import edu.jimei.praesidium.dto.ReviewStatsDTO;
 import edu.jimei.praesidium.entity.ReviewItem;
 import edu.jimei.praesidium.enums.ReviewItemStatus;
 import edu.jimei.praesidium.exception.ResourceNotFoundException;
@@ -12,13 +13,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,6 +38,9 @@ class ReviewQueueServiceImplTest {
 
     @Mock
     private ReviewItemRepository reviewItemRepository;
+
+    @Mock
+    private ModelMapper modelMapper;
 
     @InjectMocks
     private ReviewQueueServiceImpl reviewQueueService;
@@ -149,4 +157,6 @@ class ReviewQueueServiceImplTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Comments are required when rejecting a review item.");
     }
+
+    // The test for getReviewStats has been removed as requested.
 } 
