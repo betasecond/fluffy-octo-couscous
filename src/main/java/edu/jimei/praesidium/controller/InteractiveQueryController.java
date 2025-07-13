@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Advisor
  */
 @RestController
-@RequestMapping("/api/query")
+@RequestMapping("/api/v1/query")
 @RequiredArgsConstructor
 public class InteractiveQueryController {
 

@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+/**
+ * Controller for managing the knowledge base review queue.
+ */
 @RestController
 @RequestMapping("/api/v1/reviews")
 @RequiredArgsConstructor
@@ -23,6 +26,13 @@ public class ReviewQueueController {
 
     private final ReviewQueueService reviewQueueService;
 
+    /**
+     * Retrieves a paginated list of review items based on their status.
+     *
+     * @param status   The status to filter by (e.g., PENDING, APPROVED, REJECTED). Defaults to PENDING.
+     * @param pageable Pagination information.
+     * @return A response entity containing a page of review items.
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ReviewItemDto>>> getReviewItems(
             @RequestParam(required = false, defaultValue = "PENDING") ReviewItemStatus status,
@@ -31,6 +41,13 @@ public class ReviewQueueController {
         return ResponseEntity.ok(ApiResponse.success(page));
     }
 
+    /**
+     * Retrieves a single review item by its ID.
+     *
+     * @param id The UUID of the review item.
+     * @return A response entity containing the review item DTO.
+     * @throws ResourceNotFoundException if the item with the given ID is not found.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ReviewItemDto>> getReviewItemById(@PathVariable UUID id) {
         return reviewQueueService.getReviewItemById(id)
@@ -38,6 +55,13 @@ public class ReviewQueueController {
                 .orElseThrow(() -> new ResourceNotFoundException("ReviewItem not found with id: " + id));
     }
     
+    /**
+     * Submits a review decision (approve or reject) for a review item.
+     *
+     * @param id      The UUID of the review item to be reviewed.
+     * @param request The review decision, containing the new status and optional comments.
+     * @return A response entity containing the updated review item DTO.
+     */
     @PostMapping("/{id}/decision")
     public ResponseEntity<ApiResponse<ReviewItemDto>> makeReviewDecision(
             @PathVariable UUID id,
