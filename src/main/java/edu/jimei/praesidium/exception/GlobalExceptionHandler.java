@@ -19,6 +19,19 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     /**
+     * Handles exceptions from AI service interactions.
+     *
+     * @param ex The AIServiceException that was thrown.
+     * @return A ResponseEntity with a SERVICE_UNAVAILABLE status.
+     */
+    @ExceptionHandler(AIServiceException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAIServiceException(AIServiceException ex) {
+        log.error("AI service error: {}", ex.getMessage(), ex);
+        ApiResponse<Object> response = ApiResponse.error(HttpStatus.SERVICE_UNAVAILABLE, "The AI service is currently unavailable. Please try again later.");
+        return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+    
+    /**
      * Handles validation exceptions for request bodies.
      *
      * @param ex The MethodArgumentNotValidException that was thrown.
