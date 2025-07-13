@@ -9,6 +9,7 @@ import edu.jimei.praesidium.enums.ReviewItemStatus;
 import edu.jimei.praesidium.exception.ResourceNotFoundException;
 import edu.jimei.praesidium.repository.ReviewItemRepository;
 import edu.jimei.praesidium.repository.ServiceQARepository;
+import edu.jimei.praesidium.repository.ReviewHistoryRepository;
 import edu.jimei.praesidium.repository.specifications.ReviewItemSpecification;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -26,6 +27,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import edu.jimei.praesidium.dto.ReviewItemResponse;
 import edu.jimei.praesidium.dto.BatchOperationRequest;
+import edu.jimei.praesidium.dto.ReviewHistoryDto;
+import edu.jimei.praesidium.entity.ReviewHistory;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class ReviewQueueServiceImpl implements ReviewQueueService {
 
     private final ReviewItemRepository reviewItemRepository;
     private final ServiceQARepository serviceQARepository;
+    private final ReviewHistoryRepository reviewHistoryRepository;
     private final ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
@@ -81,9 +85,14 @@ public class ReviewQueueServiceImpl implements ReviewQueueService {
 
         ReviewItemResponse response = modelMapper.map(reviewItem, ReviewItemResponse.class);
 
+        List<ReviewHistory> history = reviewHistoryRepository.findByReviewItemIdOrderByCreatedAtAsc(id);
+        List<ReviewHistoryDto> historyDtos = history.stream()
+                .map(h -> modelMapper.map(h, ReviewHistoryDto.class))
+                .collect(Collectors.toList());
+
         // Placeholder for future implementation
         response.setRelatedKnowledgeItems(Collections.emptyList());
-        response.setReviewHistory(Collections.emptyList());
+        response.setReviewHistory(historyDtos);
 
         return response;
     }
@@ -95,9 +104,12 @@ public class ReviewQueueServiceImpl implements ReviewQueueService {
         ReviewItem reviewItem = reviewItemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ReviewItem not found with id: " + id));
 
+        String action;
+
         switch (request.getDecision().toLowerCase()) {
             case "approve":
                 reviewItem.setStatus(ReviewItemStatus.APPROVED);
+                action = "Approved";
                 if (request.getStandardQuestion() != null && request.getSuggestedAnswer() != null) {
                     ServiceQA newKnowledge = new ServiceQA();
                     newKnowledge.setQuestion(request.getStandardQuestion());
@@ -108,15 +120,25 @@ public class ReviewQueueServiceImpl implements ReviewQueueService {
                 break;
             case "reject":
                 reviewItem.setStatus(ReviewItemStatus.REJECTED);
+                action = "Rejected";
                 break;
             case "needsinfo":
                 reviewItem.setStatus(ReviewItemStatus.NEEDS_INFO);
+                action = "Marked as 'Needs Info'";
                 break;
             default:
                 throw new IllegalArgumentException("Invalid decision: " + request.getDecision());
         }
 
-        reviewItem.setComments(request.getComment());
+        ReviewHistory history = ReviewHistory.builder()
+                .reviewItem(reviewItem)
+                .action(action)
+                .comment(request.getComment())
+                .reviewerId("user-system") // Placeholder
+                .reviewerName("System")      // Placeholder
+                .build();
+        reviewHistoryRepository.save(history);
+
         ReviewItem updatedReviewItem = reviewItemRepository.save(reviewItem);
         return modelMapper.map(updatedReviewItem, ReviewItemDto.class);
     }
@@ -144,7 +166,6 @@ public class ReviewQueueServiceImpl implements ReviewQueueService {
 
         for (ReviewItem item : itemsToUpdate) {
             item.setStatus(statusToSet);
-            item.setComments(request.getComment());
         }
 
         reviewItemRepository.saveAll(itemsToUpdate);
