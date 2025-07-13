@@ -34,7 +34,6 @@ public class ReviewItem {
     /**
      * The actual content that needs to be reviewed.
      */
-    @Lob
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
@@ -53,7 +52,6 @@ public class ReviewItem {
     /**
      * Any comments or feedback provided by the reviewer.
      */
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String comments;
 
