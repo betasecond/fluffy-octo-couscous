@@ -42,17 +42,17 @@ Write-Host ("-"*50)
 
 try {
     # 1. Get all PENDING review items
-    Write-Host "`n[1/4] Getting all PENDING review items..."
+    Write-Host "`n[1/5] Getting all PENDING review items..."
     $pendingItems = Invoke-RestMethod -Uri "$baseUrl/reviews?status=PENDING" -Method Get
     Print-Json $pendingItems
 
     # 2. Get a specific APPROVED review item by ID
-    Write-Host "`n[2/4] Getting specific APPROVED item by ID: $approvedReviewId"
+    Write-Host "`n[2/5] Getting specific APPROVED item by ID: $approvedReviewId"
     $approvedItem = Invoke-RestMethod -Uri "$baseUrl/reviews/$approvedReviewId" -Method Get
     Print-Json $approvedItem
 
     # 3. Approve a PENDING review item
-    Write-Host "`n[3/4] Approving PENDING item with ID: $pendingReviewId"
+    Write-Host "`n[3/5] Approving PENDING item with ID: $pendingReviewId"
     $body = @{
         status = "APPROVED"
         comments = "Looks good. Approved by test script."
@@ -62,7 +62,7 @@ try {
     Write-Host "Item approved successfully."
 
     # 4. Verify the item is now APPROVED
-    Write-Host "`n[4/4] Verifying item $pendingReviewId is now APPROVED..."
+    Write-Host "`n[4/5] Verifying item $pendingReviewId is now APPROVED..."
     $verifiedItem = Invoke-RestMethod -Uri "$baseUrl/reviews/$pendingReviewId" -Method Get
     Print-Json $verifiedItem
     if ($verifiedItem.data.status -eq "APPROVED") {
@@ -71,8 +71,15 @@ try {
         Write-Host "Verification FAILED: Status is not APPROVED." -ForegroundColor Red
     }
 
-    # 5. Get reports data
-    Write-Host "`n[5/5] Getting reports data..."
+    # 5. Get ServiceQA data
+    Write-Host "`n[5/5] Getting ServiceQA data..."
+    $serviceQAData = Invoke-RestMethod -Uri "$baseUrl/serviceQA" -Method Get
+    Print-Json $serviceQAData
+    Write-Host "Successfully retrieved ServiceQA data." -ForegroundColor Green
+
+
+    # 6. Get reports data
+    Write-Host "`n[6/6] Getting reports data..."
     $reports = Invoke-RestMethod -Uri "$baseUrl/reports" -Method Get
     Print-Json $reports
     Write-Host "Successfully retrieved reports data." -ForegroundColor Green

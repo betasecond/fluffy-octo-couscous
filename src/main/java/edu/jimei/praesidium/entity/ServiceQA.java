@@ -5,6 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Entity
+@Table(name = "service_qa")
 @Data
 public class ServiceQA {
 
