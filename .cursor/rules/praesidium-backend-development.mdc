@@ -1,0 +1,101 @@
+---
+alwaysApply: true
+description: Praesidium智能客服后端开发规范和最佳实践
+---
+
+# Praesidium 智能客服后端开发规则
+
+## 项目概述
+这是一个基于Spring Boot 3.x的智能客服Copilot项目，主要包含以下核心服务：
+- 智能问答服务 (Interactive Query Service)
+- 客服辅助服务 (Agent Assist Service)  
+- 知识库审核队列服务 (Review Queue Service)
+
+## 技术栈
+- **框架**: Spring Boot 3.x
+- **AI集成**: Spring AI
+- **测试**: JUnit 5, Mockito, AssertJ
+- **数据库**: PostgreSQL (生产), H2 (测试)
+- **数据库管理**: Flyway
+
+## 开发规范
+
+### 1. 架构模式
+- **强制使用DTO和VO模式**：所有API输入输出都必须使用DTO，内部业务逻辑使用VO
+- **分层架构**：Controller -> Service -> Repository 严格分层
+- **依赖注入**：使用Spring的@Autowired或构造器注入
+
+### 2. 代码质量要求
+- 每个功能开发前必须创建TODO list进行任务管理
+- 代码必须有完整的单元测试覆盖（JUnit 5 + Mockito）
+- 所有公共方法必须有JavaDoc文档
+- 使用AssertJ进行断言以提高可读性
+
+### 3. 测试策略
+- **单元测试**：每个Service类都必须有对应的测试类
+- **模拟依赖**：使用@Mock注解模拟外部依赖（AiClient、Repository等）
+- **测试场景**：每个方法至少包含正常场景、异常场景、边界值测试
+- **测试数据**：使用H2内存数据库进行测试，避免依赖外部数据库
+
+### 4. 数据库管理
+- **严禁修改已应用的Flyway脚本**：如需变更数据库结构，必须创建新的migration文件
+- **命名规范**：migration文件使用V{版本号}__{描述}.sql格式
+- **回滚策略**：为每个migration提供对应的回滚脚本
+
+### 5. Git提交规范
+- **最小化步骤提交**：每完成一个小功能就必须提交
+- **禁止使用`git add .`**：必须明确指定要提交的文件
+- **清晰的commit message**：使用格式"feat: 功能描述"、"fix: 修复描述"、"test: 测试描述"
+- **确保代码质量**：每次提交前确保代码编译通过且测试通过
+
+### 6. API开发规范
+- **RESTful设计**：遵循REST API设计原则
+- **统一响应格式**：所有API返回统一的Response包装类
+- **异常处理**：使用@ControllerAdvice统一处理异常
+- **参数验证**：使用Bean Validation进行请求参数验证
+
+### 7. 核心服务实现要点
+
+#### 智能问答服务 (InteractiveQueryService)
+- 必须模拟AiClient、VectorStore、KnowledgeRepository依赖
+- 测试场景包括：成功匹配、未匹配、参数校验、超时处理
+- 响应格式：QueryResponse包含suggestedAnswer、confidence、keywordAnalysis等
+
+#### 客服辅助服务 (AgentAssistService)
+- 必须模拟AiClient的Function Calling功能
+- 测试场景包括：合规提醒、信息补全、情感分析、无建议触发
+- 响应格式：AssistResponse包含多种类型的建议和分析结果
+
+#### 审核队列服务 (ReviewQueueService)
+- 必须模拟ReviewItemRepository、KnowledgeRepository依赖
+- 测试场景包括：列表查询、状态更新、审核决定、异常处理
+- 支持分页和筛选功能
+
+### 8. 特殊注意事项
+- 所有AI相关的调用都必须有超时和异常处理机制
+- 敏感信息（如API密钥）必须使用配置文件管理，不能硬编码
+- 日志记录必须包含请求ID，便于问题追踪
+- 性能关键的接口必须有缓存策略
+
+### 9. 项目文件结构
+```
+src/main/java/edu/jimei/praesidium/
+├── controller/     # 控制器层
+├── service/        # 服务层
+├── repository/     # 数据访问层
+├── dto/           # 数据传输对象
+├── vo/            # 值对象
+├── entity/        # 实体类
+├── config/        # 配置类
+└── exception/     # 异常处理
+```
+
+## 开发流程
+1. 分析需求，创建TODO list
+2. 设计DTO/VO和接口
+3. 实现Service层业务逻辑
+4. 编写单元测试
+5. 实现Controller层
+6. 集成测试
+7. 代码审查
+8. Git提交（小步骤，清晰message）
