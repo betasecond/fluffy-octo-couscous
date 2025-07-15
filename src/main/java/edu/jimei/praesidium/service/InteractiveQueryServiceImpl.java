@@ -38,7 +38,7 @@ public class InteractiveQueryServiceImpl implements InteractiveQueryService {
 
         try {
             String response = chatClient.prompt()
-                    .user(request.getQuery())
+                    .user(request.getQuery()+"\n\n"+"请根据以上内容，给出最符合用户意图的回答。需要使用中文回答。")
                     .call()
                     .content();
 

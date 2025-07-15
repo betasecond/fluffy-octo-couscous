@@ -1,13 +1,14 @@
 package edu.jimei.praesidium.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.jimei.praesidium.dto.AgentAssistRequest;
 import edu.jimei.praesidium.dto.AssistResponse;
 import edu.jimei.praesidium.exception.AIServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 
 /**
  * Implementation of the AgentAssistService.
@@ -18,52 +19,53 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class AgentAssistServiceImpl implements AgentAssistService {
 
-    // private final ChatClient chatClient; // Will be used later for function calling
+    private final ChatClient chatClient;
+    private final ObjectMapper objectMapper;
 
-    /**
-     * Provides real-time assistance to an agent based on the current conversation draft.
-     * <p>
-     * Note: This is a placeholder implementation. The actual implementation would use
-     * AI function calling to perform compliance checks, sentiment analysis, etc.
-     *
-     * @param request The agent assistance request, containing the conversation context.
-     * @return An AssistResponse with various analyses and suggestions.
-     * @throws AIServiceException if there is an error communicating with the AI service.
-     */
+    private static final String SYSTEM_PROMPT = """
+            You are a professional assistant for customer service agents.
+            Your task is to analyze the provided conversation context (history and current draft) and provide helpful, structured feedback.
+            The conversation context will be provided as a JSON object.
+            Your response MUST be a valid JSON object that strictly adheres to the structure of the AssistResponse class.
+            Do not include any text or explanations outside of the JSON object.
+
+            The AssistResponse structure is as follows:
+            {
+              "suggestions": ["suggestion 1", "suggestion 2"],
+              "complianceAnalysis": {
+                "hasIssues": boolean,
+                "issues": ["issue 1", "issue 2"]
+              },
+              "sentimentAnalysis": {
+                "type": "POSITIVE | NEGATIVE | NEUTRAL",
+                "score": float (from 0.0 to 1.0)
+              },
+              "informationCompleteness": {
+                "isComplete": boolean,
+                "missingInfo": ["missing info 1", "missing info 2"]
+              }
+            }
+
+            json的value 你需要用中文回答
+            """;
+
+
     @Override
     public AssistResponse getRealtimeAssistance(AgentAssistRequest request) {
-
         try {
-            // This is a placeholder for the actual logic which would involve:
-            // 1. Defining tools for compliance check, sentiment analysis, etc.
-            // 2. Building a prompt that instructs the AI to use these tools.
-            // 3. Calling the AI model with function calling enabled.
-            // 4. Processing the AI's response, which might be a tool call or a direct text response.
+            String requestAsJson = objectMapper.writeValueAsString(request);
 
-            // Returning a hard-coded response for now.
-            var complianceAnalysis = AssistResponse.ComplianceAnalysis.builder()
-                    .hasIssues(false)
-                    .issues(Collections.emptyList())
-                    .build();
+            return chatClient.prompt()
+                    .system(SYSTEM_PROMPT)
+                    .user(requestAsJson)
+                    .call()
+                    .entity(AssistResponse.class);
 
-            var sentimentAnalysis = AssistResponse.SentimentAnalysis.builder()
-                    .type(AssistResponse.SentimentType.NEUTRAL)
-                    .score(0.5)
-                    .build();
-
-            var infoCompleteness = AssistResponse.InformationCompleteness.builder()
-                    .isComplete(true)
-                    .missingInfo(Collections.emptyList())
-                    .build();
-
-            return AssistResponse.builder()
-                    .suggestions(Collections.emptyList())
-                    .complianceAnalysis(complianceAnalysis)
-                    .sentimentAnalysis(sentimentAnalysis)
-                    .informationCompleteness(infoCompleteness)
-                    .build();
+        } catch (JsonProcessingException e) {
+            log.error("Error serializing AgentAssistRequest to JSON", e);
+            throw new AIServiceException("Failed to serialize request for AI service.", e);
         } catch (Exception e) {
-            log.error("Error getting real-time assistance for agent : {}",  e.getMessage(), e);
+            log.error("Error getting real-time assistance for agent : {}", e.getMessage(), e);
             throw new AIServiceException("Failed to get real-time assistance from AI service.", e);
         }
     }
