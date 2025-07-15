@@ -3,11 +3,11 @@
     {
       "id": "introduction",
       "title": "1. 介绍",
-      "mainTitle": "1. Copilot 概念演示介绍",
+      "mainTitle": "1. Copilot 介绍",
       "content": [
         {
           "type": "paragraph",
-          "text": "欢迎来到 Copilot 概念演示。本演示旨在通过简化的交互场景，帮助您理解智能客服助手 Copilot 的核心工作理念和关键能力。您可以通过左侧导航切换不同的演示模块和说明章节。"
+          "text": "欢迎来到 Copilot 。本演示旨在通过简化的交互场景，帮助您理解智能客服助手 Copilot 的核心工作理念和关键能力。您可以通过左侧导航切换不同的演示模块和说明章节。"
         },
         {
           "type": "paragraph",
