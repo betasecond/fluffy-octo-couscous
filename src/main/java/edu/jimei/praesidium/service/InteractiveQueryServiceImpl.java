@@ -21,6 +21,9 @@ public class InteractiveQueryServiceImpl implements InteractiveQueryService {
 
     private final ChatClient chatClient;
 
+    public static record AiResponse(String suggestedAnswer, double confidence, List<String> keywordAnalysis, boolean needsHumanReview) {
+    }
+
     /**
      * Submits a user's query to the AI service for a response.
      * <p>
@@ -37,18 +40,26 @@ public class InteractiveQueryServiceImpl implements InteractiveQueryService {
         log.info("Submitting query to AI for user []: '{}'", request.getQuery());
 
         try {
-            String response = chatClient.prompt()
-                    .user(request.getQuery()+"\n\n"+"请根据以上内容，给出最符合用户意图的回答。需要使用中文回答。")
+            var systemPrompt = """
+                    You are a professional customer service assistant. Your task is to analyze the user's query and provide a helpful response.
+                    Based on the user's query, you need to generate a response in JSON format with the following fields:
+                    - suggestedAnswer: A clear and concise answer to the user's question.
+                    - confidence: A value between 0.0 and 1.0, representing your confidence in the answer.
+                    - keywordAnalysis: A list of keywords extracted from the user's query.
+                    - needsHumanReview: A boolean value indicating whether the query is too complex and requires human intervention.
+                    """;
+
+            AiResponse response = chatClient.prompt()
+                    .system(systemPrompt)
+                    .user(request.getQuery())
                     .call()
-                    .content();
+                    .entity(AiResponse.class);
 
-
-            // Placeholder mapping to QueryResponse
             return QueryResponse.builder()
-                    .suggestedAnswer(response)
-                    .confidence(0.9) // Placeholder value
-                    .keywordAnalysis(List.of("placeholder")) // Placeholder value
-                    .needsHumanReview(false) // Placeholder value
+                    .suggestedAnswer(response.suggestedAnswer())
+                    .confidence(response.confidence())
+                    .keywordAnalysis(response.keywordAnalysis())
+                    .needsHumanReview(response.needsHumanReview())
                     .build();
         } catch (Exception e) {
             log.error("Error calling AI service for query from user []: {}", request.getQuery(), e);
